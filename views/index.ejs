@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Team Info</title>
+</head>
+<body>
+    <% teamInfo.forEach(info => { %>
+        <div>
+            <h2><%= info.name %></h2>
+            <p>Team: <%= info.team %></p>
+            <p>Mat: <%= info.mat %></p>
+            <p>Time: <%= info.time %></p>
+        </div>
+    <% }); %>
+
+    <ul id="list">
+        <!-- Existing list items here -->
+    </ul>
+
+    <button id="refreshButton">Refresh</button>
+
+    <script>
+        // Create a new li element with the class "mach--weighted"
+        var newListItem = document.createElement('li');
+        newListItem.className = 'mach--weighted';
+        newListItem.textContent = 'New Element';
+
+        // Append the new li element to the list
+        document.getElementById('list').appendChild(newListItem);
+
+        document.getElementById('refreshButton').addEventListener('click', function() {
+            location.reload();
+        });
+    </script>
+</body>
+</html>
