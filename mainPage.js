@@ -4,10 +4,16 @@ const { getAllCompetitors } = require('./Team.js'); // Import the function from 
 const app = express();
 app.set('view engine', 'ejs');
 
-app.get('/', async (req, res) => {
-    const url = 'https://www.bjjcompsystem.com/tournaments/2492/tournament_days/by_club?club_id=664'; // Replace with your URL
-    const teamInfo = await getAllCompetitors(url);
-    res.render('index', { teamInfo }); // Render the index.ejs file with the teamInfo data
+app.get('/team-info', async (req, res) => {
+    const url = 'https://www.bjjcompsystem.com/tournaments/2488/tournament_days/by_club?club_id=849'; // Replace with your URL
+    let teamInfo;
+    try {
+        teamInfo = await getAllCompetitors(url);
+    } catch (error) {
+        console.error(`Error getting competitors: ${error.message}`);
+        teamInfo = []; // Set teamInfo to an empty array if an error occurs
+    }
+    res.json(teamInfo); // Send the teamInfo data as JSON
 });
 
 const port = process.env.PORT || 3000;
