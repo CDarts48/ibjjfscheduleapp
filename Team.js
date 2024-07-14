@@ -1,3 +1,5 @@
+// Also copy down youtube live stream link for watch parties.
+
 const axios = require('axios');
 const cheerio = require('cheerio');
 
@@ -12,7 +14,7 @@ async function getAllCompetitors(url) {
               const matNumber = $(matchCard).find('.search-match-header__where').text().trim();
               const matchTime = $(matchCard).find('.search-match-header__when').text().trim();
           
-              $(matchCard).find('.match-card__competitor').first().each((j, competitorDiv) => {
+              $(matchCard).find('.match-card__competitor').first().each((competitorDiv) => {
                   const competitorName = $(competitorDiv).find('.match-card__competitor-name').text().trim();
                   const teamName = $(competitorDiv).find('.match-card__club-name').text().trim();
                   const competitorId = $(competitorDiv).attr('id');

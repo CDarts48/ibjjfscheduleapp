@@ -4,48 +4,35 @@
     <title>Team Info</title>
 </head>
 <body>
-    <% teamInfo.forEach(info => { %>
-        <div>
-            <h2><%= info.name %></h2>
-            <p>Team: <%= info.team %></p>
-            <p>Mat: <%= info.mat %></p>
-            <p>Time: <%= info.time %></p>
-        </div>
-    <% }); %>
-
-    <ul id="list">
-        <!-- Existing list items here -->
-    </ul>
-
-    <button id="refreshButton">Refresh</button>
+    <button id="refreshButton" onclick="updateTeamInfo()">Refresh</button>
+    <div id="teamInfo">
+        <% teamInfo.forEach(info => { %>
+            <div>
+                <h2><%= info.name %></h2>
+                <p>Team: <%= info.team %></p>
+                <p>Mat: <%= info.mat %></p>
+                <p>Time: <%= info.time %></p>
+            </div>
+        <% }); %>
+    </div>
 
     <script>
         function updateTeamInfo() {
-            fetch('/team-info')
-                .then(response => response.json())
-                .then(teamInfo => {
-                    // Clear the existing team info
-                    const teamInfoDiv = document.getElementById('teamInfo');
-                    teamInfoDiv.innerHTML = '';
-    
-                    // Add the new team info
-                    teamInfo.forEach(info => {
-                        const infoDiv = document.createElement('div');
-                        infoDiv.innerHTML = `
-                            <h2>${info.name}</h2>
-                            <p>Team: ${info.team}</p>
-                            <p>Mat: ${info.mat}</p>
-                            <p>Time: ${info.time}</p>
-                        `;
-                        teamInfoDiv.appendChild(infoDiv);
-                    });
+            fetch('/update-sheet')
+                .then(response => {
+                    console.log('Response:', response);
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Data:', data);
+                    if (data.success) {
+                        location.reload(); // Reload the page to update the team info
+                    } else {
+                        console.error(`Error updating team info: ${data.message}`);
+                    }
                 })
                 .catch(error => console.error(`Error updating team info: ${error.message}`));
         }
-    
-        // Update the team info immediately when the page loads, and then every 15 seconds
-        updateTeamInfo();
-        setInterval(updateTeamInfo, 15000);
     </script>
     </body>
 </html>
