@@ -29,7 +29,7 @@ async function getAllCompetitors(url) {
   }
 }
 
-getAllCompetitors('https://www.bjjcompsystem.com/tournaments/2492/tournament_days/by_club?club_id=664')
+getAllCompetitors('https://www.bjjcompsystem.com/tournaments/2451/tournament_days/by_club?club_id=664')
   .then(competitors => console.log(competitors))
   .catch(error => console.error(`Error in promise: ${error.message}`));
 

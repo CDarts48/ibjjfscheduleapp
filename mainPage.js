@@ -5,7 +5,7 @@ const app = express();
 app.set('view engine', 'ejs');
 
 app.get('/team-info', async (req, res) => {
-    const url = 'https://www.bjjcompsystem.com/tournaments/2488/tournament_days/by_club?club_id=849'; // Replace with your URL
+    const url = 'https://www.bjjcompsystem.com/tournaments/2451/tournament_days/by_club?club_id=664'; // Replace with your URL
     let teamInfo;
     try {
         teamInfo = await getAllCompetitors(url);
