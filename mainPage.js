@@ -5,7 +5,7 @@ const app = express();
 app.set('view engine', 'ejs');
 
 async function fetchTeamInfo() {
-    const url = 'https://www.bjjcompsystem.com/tournaments/2451/tournament_days/by_club?club_id=664';
+    const url = 'https://www.bjjcompsystem.com/tournaments/2471/tournament_days/by_club?page=1&club_id=664';
     try {
         return await getAllCompetitors(url);
     } catch (error) {
