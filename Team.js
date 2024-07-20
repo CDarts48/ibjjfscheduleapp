@@ -16,14 +16,9 @@ async function getAllCompetitors(url) {
 
       $(matchCard).find('.match-card__competitor').each((j, competitorDiv) => {
         const competitorLink = $(competitorDiv).find('a');
-console.log(competitorLink);
         const competitorName = $(competitorDiv).find('.match-card__competitor-name').text().trim();
         const teamName = $(competitorDiv).find('.match-card__club-name').text().trim();
         const competitorId = $(competitorDiv).attr('id').replace('competitor-', '');
-        
-        if (teamName === 'CheckMat') {
-          console.log(`Competitor Name: ${competitorName}, Team Name: ${teamName}, Competitor ID: ${competitorId}`);
-        }
 
         if (teamName === 'CheckMat' && competitorId && !competitors.some(c => c.id === competitorId)) {
           competitors.push({
