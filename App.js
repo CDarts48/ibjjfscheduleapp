@@ -23,4 +23,4 @@ async function writeTeamInfoToSheet(teamInfo) {
 
     return update.data; // This will return the response from the Google Sheets API
 }
-    
+module.exports = { writeTeamInfoToSheet };

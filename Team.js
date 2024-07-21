@@ -1,5 +1,6 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
+const { writeTeamInfoToSheet } = require('./App'); // Make sure to import this function
 
 async function getAllCompetitors(url) {
   try {
@@ -32,6 +33,15 @@ async function getAllCompetitors(url) {
       });
     });
 
+    // Prepare data for Google Sheets
+    const sheetData = competitors.map(c => [c.team, c.name, c.id, c.mat, c.time]);
+    sheetData.unshift(['Team Name', 'Competitor Name', 'Competitor ID', 'Mat Number', 'Match Time']); // Add header row
+
+    // Write data to Google Sheets
+    await writeTeamInfoToSheet(sheetData)
+      .then(() => console.log('Data successfully written to Google Sheet'))
+      .catch(error => console.error(`Error writing to Google Sheet: ${error.message}`));
+
     return competitors;
 
   } catch (error) {
@@ -39,7 +49,7 @@ async function getAllCompetitors(url) {
   }
 }
 
-getAllCompetitors('https://www.bjjcompsystem.com/tournaments/2471/tournament_days/by_club?page=1&club_id=664')
+getAllCompetitors('https://www.bjjcompsystem.com/tournaments/2455/tournament_days/by_club?club_id=664')
   .then(competitors => console.log(competitors))
   .catch(error => console.error(`Error in promise: ${error.message}`));
 
