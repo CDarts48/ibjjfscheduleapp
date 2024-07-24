@@ -21,7 +21,7 @@ async function getAllCompetitors(url) {
         const teamName = $(competitorDiv).find('.match-card__club-name').text().trim();
         const competitorId = $(competitorDiv).attr('id').replace('competitor-', '');
 
-        if (teamName === 'CheckMat' && competitorId && !competitors.some(c => c.id === competitorId)) {
+        if (teamName === 'Easton BJJ' && competitorId && !competitors.some(c => c.id === competitorId)) {
           competitors.push({
             id: competitorId,
             name: competitorName,
@@ -49,7 +49,7 @@ async function getAllCompetitors(url) {
   }
 }
 
-getAllCompetitors('https://www.bjjcompsystem.com/tournaments/2455/tournament_days/by_club?club_id=664')
+getAllCompetitors('https://www.bjjcompsystem.com/tournaments/2456/tournament_days/by_club?club_id=611')
   .then(competitors => console.log(competitors))
   .catch(error => console.error(`Error in promise: ${error.message}`));
 

@@ -9,7 +9,7 @@ const sheets = google.sheets({ version: 'v4', auth: process.env.API_KEY });
 
 app.get('/update-sheet', async (req, res) => {
     try {
-        const url = 'https://www.bjjcompsystem.com/tournaments/2455/tournament_days/by_club?club_id=664';
+        const url = 'https://www.bjjcompsystem.com/tournaments/2456/tournament_days/by_club?club_id=611';
         const competitors = await getAllCompetitors(url);
         console.log('Competitors:', competitors); // Log the competitors data
 
