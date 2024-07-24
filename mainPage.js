@@ -24,5 +24,10 @@ app.get('/team-info', async (req, res) => {
     res.json(teamInfo);
 });
 
+app.get('/update-sheet', function(req, res) {
+    // Your code here to handle the request and send a response
+    res.send('You have reached the /update-sheet route');
+});
+
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`Server running on port ${port}`));
