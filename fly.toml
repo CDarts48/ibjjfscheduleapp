@@ -1,9 +1,9 @@
-# fly.toml app configuration file generated for masterapp-bitter-snow-8872 on 2024-07-24T07:08:48-06:00
+# fly.toml app configuration file generated for masterapp-weathered-darkness-5679 on 2024-07-26T19:09:36-06:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'masterapp-bitter-snow-8872'
+app = 'masterapp-weathered-darkness-5679'
 primary_region = 'ord'
 
 [build]
