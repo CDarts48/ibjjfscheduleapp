@@ -1,33 +1,23 @@
 const express = require('express');
-const { getAllCompetitors } = require('./Team.js');
+const { getAllEastonCompetitors } = require('/Users/corey/Desktop/masterApp/matches.js'); // replace with the path to your script
 
 const app = express();
 app.set('view engine', 'ejs');
 
-async function fetchTeamInfo() {
-    const url = 'https://www.bjjcompsystem.com/tournaments/2456/tournament_days/by_club?club_id=611';
-    try {
-        return await getAllCompetitors(url);
-    } catch (error) {
-        console.error(`Error getting competitors: ${error.message}`);
-        return []; // Return an empty array if an error occurs
-    }
-}
-
 app.get('/', async (req, res) => {
-    const teamInfo = await fetchTeamInfo();
-    res.render('index', { teamInfo });
+    const urls = [
+        'https://www.bjjcompsystem.com/tournaments/2456/tournament_days/3329',
+        'https://www.bjjcompsystem.com/tournaments/2456/tournament_days/3329?page=2',
+        'https://www.bjjcompsystem.com/tournaments/2456/tournament_days/3329?page=3'
+    ];
+
+    try {
+        const teamInfo = await getAllEastonCompetitors(urls);
+        res.render('index', { teamInfo }); // replace 'index' with the name of your EJS file
+    } catch (error) {
+        console.error(`Error in promise: ${error.message}`);
+        res.status(500).send('An error occurred while fetching the team info.');
+    }
 });
 
-app.get('/team-info', async (req, res) => {
-    const teamInfo = await fetchTeamInfo();
-    res.json(teamInfo);
-});
-
-app.get('/update-sheet', function(req, res) {
-    // Your code here to handle the request and send a response
-    res.send('You have reached the /update-sheet route');
-});
-
-const port = process.env.PORT || 3000;
-app.listen(port, () => console.log(`Server running on port ${port}`));
+app.listen(3000, () => console.log('Server running on port 3000'));

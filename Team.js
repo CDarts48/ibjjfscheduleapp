@@ -1,49 +1,55 @@
-const axios = require('axios');
-const cheerio = require('cheerio');
-const { writeTeamInfoToSheet } = require('./App'); // Make sure to import this function
+const puppeteer = require('puppeteer');
+const { writeTeamInfoToSheet } = require('./App');
 
 async function getAllCompetitors(url) {
   try {
-    const response = await axios.get(url);
-    const $ = cheerio.load(response.data);
-    const matchCards = $('li.match--weighted, li.match--assigned, li.match--created');
-    const competitors = [];
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
+    await page.goto(url, { waitUntil: 'networkidle0' });
 
-    console.log(`Found ${matchCards.length} match cards`);
+    const competitors = await page.evaluate(() => {
+      const matElements = Array.from(document.querySelectorAll('.grid-column__header'));
+      const competitors = [];
 
-    matchCards.each((i, matchCard) => {
-      const matNumber = $(matchCard).find('.search-match-header__where').text().trim();
-      const matchTime = $(matchCard).find('.search-match-header__when').text().trim();
+      matElements.forEach((matElement) => {
+        const matNumber = matElement.textContent.trim();
+        const matchCards = Array.from(matElement.parentElement.querySelectorAll('li.match--weighted, li.match--assigned, li.match--created'));
 
-      $(matchCard).find('.match-card__competitor').each((j, competitorDiv) => {
-        const competitorLink = $(competitorDiv).find('a');
-        const competitorName = $(competitorDiv).find('.match-card__competitor-name').text().trim();
-        const teamName = $(competitorDiv).find('.match-card__club-name').text().trim();
-        const competitorId = $(competitorDiv).attr('id').replace('competitor-', '');
+        matchCards.forEach((matchCard) => {
+          const matchTime = matchCard.querySelector('.search-match-header__when').textContent.trim();
 
-        if (teamName === 'Easton BJJ' && competitorId && !competitors.some(c => c.id === competitorId)) {
-          competitors.push({
-            id: competitorId,
-            name: competitorName,
-            team: teamName,
-            mat: matNumber,
-            time: matchTime
+          const competitorDivs = Array.from(matchCard.querySelectorAll('.match-card__competitor'));
+          competitorDivs.forEach((competitorDiv) => {
+            const competitorName = competitorDiv.querySelector('.match-card__competitor-name').textContent.trim();
+            const teamName = competitorDiv.querySelector('.match-card__club-name').textContent.trim();
+            const competitorId = competitorDiv.id.replace('competitor-', '');
+
+            if (teamName === 'Easton BJJ' && competitorId && !competitors.some(c => c.id === competitorId)) {
+              competitors.push({
+                id: competitorId,
+                name: competitorName,
+                team: teamName,
+                mat: matNumber,
+                time: matchTime
+              });
+            }
           });
-        }
+        });
       });
+
+      return competitors;
     });
 
-    // Prepare data for Google Sheets
     const sheetData = competitors.map(c => [c.team, c.name, c.id, c.mat, c.time]);
-    sheetData.unshift(['Team Name', 'Competitor Name', 'Competitor ID', 'Mat Number', 'Match Time']); // Add header row
+    sheetData.unshift(['Team Name', 'Competitor Name', 'Competitor ID', 'Mat Number', 'Match Time']);
 
-    // Write data to Google Sheets
     await writeTeamInfoToSheet(sheetData)
       .then(() => console.log('Data successfully written to Google Sheet'))
       .catch(error => console.error(`Error writing to Google Sheet: ${error.message}`));
 
-    return competitors;
+    await browser.close();
 
+    return competitors;
   } catch (error) {
     console.error(`Error in getAllCompetitors: ${error.message}`);
   }

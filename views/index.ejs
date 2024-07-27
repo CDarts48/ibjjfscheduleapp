@@ -8,21 +8,16 @@
 <body>
     <button id="refreshButton" onclick="location.reload()" style="font-size: 50px; padding: 20px 50px;">Refresh</button>
     <div id="teamInfo">
-        <% teamInfo.forEach(info=> { %>
-            <div>
-                <h2>
-                    <%= info.name %>
-                </h2>
-                <p>Team: <%= info.team %>
-                </p>
-                <p>Mat: <%= info.mat %>
-                </p>
-                <p>Time: <%= info.time %>
-                </p>
+        <% teamInfo.forEach(competitor => { %>
+            <div style="<%= competitor.highlight ? 'color: red;' : '' %>">
+                <h2><%= competitor.name %></h2>
+                <p>Team: <%= competitor.team %></p>
+                <p>Mat: <%= competitor.mat %></p>
+                <p>Time: <%= competitor.time %></p>
             </div>
-            <% }); %>
+        <% }); %>
     </div>
-
+    
     <!-- <script>
         function updateTeamInfo() {
             fetch('/update-sheet')
