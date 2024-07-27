@@ -1,5 +1,5 @@
 const express = require('express');
-const { getAllEastonCompetitors } = require('/Users/corey/Desktop/masterApp/matches.js'); // replace with the path to your script
+const { getAllEastonCompetitors } = require('./matches.js'); // replace with the path to your script
 
 const app = express();
 app.set('view engine', 'ejs');
