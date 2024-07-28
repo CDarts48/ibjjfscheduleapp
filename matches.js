@@ -5,6 +5,7 @@ async function getAllEastonCompetitors(urls) {
     try {
         const allCompetitors = [];
 
+        // Define the convertTo24Hour function
         function convertTo24Hour(time) {
             const [mainTime, period] = time.split(' ');
             let [hours, minutes] = mainTime.split(':');
@@ -22,9 +23,6 @@ async function getAllEastonCompetitors(urls) {
             const response = await axios.get(url);
             const $ = cheerio.load(response.data);
             const matElements = $('.categories-grid__column.sticky-panel');
-            const date = new Date();
-            const options = { day: '2-digit', month: '2-digit', year: '2-digit' };
-            const dateText = date.toLocaleDateString('en-US', options);  // Updated date to current date
 
             matElements.each((i, matElement) => {
                 const matNumber = $(matElement).find('.grid-column__header').text().trim();
@@ -44,46 +42,54 @@ async function getAllEastonCompetitors(urls) {
                             name: competitorName,
                             team: teamName,
                             mat: matNumber,
-                            time: timeWithoutFightNumber,
-                            date: dateText  // Added date
+                            time: timeWithoutFightNumber
                         });
                     }
                 });
             });
         }));
 
-        allCompetitors.sort((a, b) => {
-            const timeA = convertTo24Hour(a.time.split(': FIGHT')[0]);
-            const timeB = convertTo24Hour(b.time.split(': FIGHT')[0]);
+// Sort the competitors by time
+allCompetitors.sort((a, b) => {
+    // Extract the time part from the string
+    const timeA = convertTo24Hour(a.time.split(': FIGHT')[0]);
+    const timeB = convertTo24Hour(b.time.split(': FIGHT')[0]);
 
-            const dateA = new Date(`1970-01-01T${timeA}`);
-            const dateB = new Date(`1970-01-01T${timeB}`);
+    // Convert the time to a Date object
+    const dateA = new Date(`1970-01-01T${timeA}`);
+    const dateB = new Date(`1970-01-01T${timeB}`);
 
-            return dateA - dateB;
-        });
+    // Compare the dates
+    return dateA - dateB;
+});
 
-        for (let i = 0; i < allCompetitors.length - 1; i++) {
-            if (allCompetitors[i].time === allCompetitors[i + 1].time) {
-                allCompetitors[i].highlight = true;
-                allCompetitors[i + 1].highlight = true;
-            }
-        }
-
-        return allCompetitors;  // Return allCompetitors when all promises have resolved
-    } catch (error) {
-        console.error(`Error in getAllEastonCompetitors: ${error.message}`);
-        return [];  // Return an empty array when an error occurs
+// Highlight competitors with the same match time
+for (let i = 0; i < allCompetitors.length - 1; i++) {
+    if (allCompetitors[i].time === allCompetitors[i + 1].time) {
+        allCompetitors[i].highlight = true;
+        allCompetitors[i + 1].highlight = true;
     }
 }
 
+        return allCompetitors;
+        
+    } catch (error) {
+        console.error(`Error in getAllEastonCompetitors: ${error.message}`);
+    }
+}
+
+const urls = [
+    'https://www.bjjcompsystem.com/tournaments/2456/tournament_days/3330',
+    'https://www.bjjcompsystem.com/tournaments/2456/tournament_days/3330?page=2',
+    'https://www.bjjcompsystem.com/tournaments/2456/tournament_days/3330?page=3'
+];
 
 getAllEastonCompetitors(urls)
 .then(competitors => {
     competitors.forEach(competitor => {
-        console.log(`ID: ${competitor.id}, Name: ${competitor.name}, Team: ${competitor.team}, Mat: ${competitor.mat}, Time: ${competitor.time}, Date: ${competitor.date}`);
+        console.log(`ID: ${competitor.id}, Name: ${competitor.name}, Team: ${competitor.team}, Mat: ${competitor.mat}, Time: ${competitor.time}`);
     });
 })
 .catch(error => console.error(`Error in promise: ${error.message}`));
 
 module.exports = { getAllEastonCompetitors };
-// this should help
