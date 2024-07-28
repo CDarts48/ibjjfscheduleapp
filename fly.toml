@@ -1,9 +1,9 @@
-# fly.toml app configuration file generated for masterapp-wild-surf-9035 on 2024-07-26T20:54:29-06:00
+# fly.toml app configuration file generated for masterapp-bold-star-4928 on 2024-07-28T09:11:22-06:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'masterapp-wild-surf-9035'
+app = 'masterapp-bold-star-4928'
 primary_region = 'ord'
 
 [build]
