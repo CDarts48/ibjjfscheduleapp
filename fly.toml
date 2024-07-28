@@ -1,9 +1,9 @@
-# fly.toml app configuration file generated for masterapp-empty-sound-9458 on 2024-07-28T09:35:56-06:00
+# fly.toml app configuration file generated for masterapp-withered-wildflower-6195 on 2024-07-28T09:39:28-06:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'masterapp-empty-sound-9458'
+app = 'masterapp-withered-wildflower-6195'
 primary_region = 'ord'
 
 [build]
