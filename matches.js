@@ -1,11 +1,12 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
+const urls = require('/Users/corey/Desktop/masterApp/urls.js');
+
 
 async function getAllEastonCompetitors(urls) {
     try {
         const allCompetitors = [];
 
-        // Define the convertTo24Hour function
         function convertTo24Hour(time) {
             const [mainTime, period] = time.split(' ');
             let [hours, minutes] = mainTime.split(':');
@@ -23,6 +24,9 @@ async function getAllEastonCompetitors(urls) {
             const response = await axios.get(url);
             const $ = cheerio.load(response.data);
             const matElements = $('.categories-grid__column.sticky-panel');
+            const date = new Date();
+            const options = { day: '2-digit', month: '2-digit', year: '2-digit' };
+            const dateText = date.toLocaleDateString('en-US', options);  // Updated date to current date
 
             matElements.each((i, matElement) => {
                 const matNumber = $(matElement).find('.grid-column__header').text().trim();
@@ -36,58 +40,49 @@ async function getAllEastonCompetitors(urls) {
                     const matchTime = $(competitorDiv).closest('li').find('.match-header__when').text().trim();
                     const timeWithoutFightNumber = matchTime.split(': FIGHT')[0];
                     
-                    if (teamName === 'Easton BJJ' && competitorId && !allCompetitors.some(c => c.id === competitorId)) {
+                    if (teamName === 'CheckMat' && competitorId && !allCompetitors.some(c => c.id === competitorId)) {
                         allCompetitors.push({
                             id: competitorId,
                             name: competitorName,
                             team: teamName,
                             mat: matNumber,
-                            time: timeWithoutFightNumber
+                            time: timeWithoutFightNumber,
+                            date: dateText  // Added date
                         });
                     }
                 });
             });
         }));
 
-// Sort the competitors by time
-allCompetitors.sort((a, b) => {
-    // Extract the time part from the string
-    const timeA = convertTo24Hour(a.time.split(': FIGHT')[0]);
-    const timeB = convertTo24Hour(b.time.split(': FIGHT')[0]);
+        allCompetitors.sort((a, b) => {
+            const timeA = convertTo24Hour(a.time.split(': FIGHT')[0]);
+            const timeB = convertTo24Hour(b.time.split(': FIGHT')[0]);
 
-    // Convert the time to a Date object
-    const dateA = new Date(`1970-01-01T${timeA}`);
-    const dateB = new Date(`1970-01-01T${timeB}`);
+            const dateA = new Date(`1970-01-01T${timeA}`);
+            const dateB = new Date(`1970-01-01T${timeB}`);
 
-    // Compare the dates
-    return dateA - dateB;
-});
+            return dateA - dateB;
+        });
 
-// Highlight competitors with the same match time
-for (let i = 0; i < allCompetitors.length - 1; i++) {
-    if (allCompetitors[i].time === allCompetitors[i + 1].time) {
-        allCompetitors[i].highlight = true;
-        allCompetitors[i + 1].highlight = true;
-    }
-}
+        for (let i = 0; i < allCompetitors.length - 1; i++) {
+            if (allCompetitors[i].time === allCompetitors[i + 1].time) {
+                allCompetitors[i].highlight = true;
+                allCompetitors[i + 1].highlight = true;
+            }
+        }
 
-        return allCompetitors;
-        
+        return allCompetitors;  // Return allCompetitors when all promises have resolved
     } catch (error) {
         console.error(`Error in getAllEastonCompetitors: ${error.message}`);
+        return [];  // Return an empty array when an error occurs
     }
 }
 
-const urls = [
-    'https://www.bjjcompsystem.com/tournaments/2456/tournament_days/3329',
-    'https://www.bjjcompsystem.com/tournaments/2456/tournament_days/3329?page=2',
-    'https://www.bjjcompsystem.com/tournaments/2456/tournament_days/3329?page=3'
-];
 
 getAllEastonCompetitors(urls)
 .then(competitors => {
     competitors.forEach(competitor => {
-        console.log(`ID: ${competitor.id}, Name: ${competitor.name}, Team: ${competitor.team}, Mat: ${competitor.mat}, Time: ${competitor.time}`);
+        console.log(`ID: ${competitor.id}, Name: ${competitor.name}, Team: ${competitor.team}, Mat: ${competitor.mat}, Time: ${competitor.time}, Date: ${competitor.date}`);
     });
 })
 .catch(error => console.error(`Error in promise: ${error.message}`));
