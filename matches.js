@@ -1,7 +1,5 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
-const urls = require('/Users/corey/Desktop/masterApp/urls.js');
-
 
 async function getAllEastonCompetitors(urls) {
     try {
