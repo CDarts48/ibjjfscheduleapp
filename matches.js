@@ -88,3 +88,4 @@ getAllEastonCompetitors(urls)
 .catch(error => console.error(`Error in promise: ${error.message}`));
 
 module.exports = { getAllEastonCompetitors };
+// this should help
