@@ -5,11 +5,12 @@ const app = express();
 app.set('view engine', 'ejs');
 
 app.get('/', async (req, res) => {
-    const urls = [
-        'https://www.bjjcompsystem.com/tournaments/2456/tournament_days/3330',
-        'https://www.bjjcompsystem.com/tournaments/2456/tournament_days/3330?page=2',
-        'https://www.bjjcompsystem.com/tournaments/2456/tournament_days/3330?page=3'
-    ];
+    const urls = [];
+    const baseUrl = 'https://www.bjjcompsystem.com/tournaments/2360/tournament_days/3446?page=';
+
+    for (let i = 1; i <= 8; i++) {
+        urls.push(`${baseUrl}${i}`);
+    }
 
     try {
         const teamInfo = await getAllEastonCompetitors(urls);
