@@ -1,3 +1,4 @@
+<!-- Just a big Refresh button to refresh the competitors list If in red it means that two competitors are competing at the same time -->
 <!DOCTYPE html>
 <html>
 
@@ -6,17 +7,24 @@
 </head>
 
 <body>
+    <script>
+        console.log("<%= teamInfo ? JSON.stringify(teamInfo) : '[]' %>");
+    </script>
     <button id="refreshButton" onclick="location.reload()" style="font-size: 50px; padding: 20px 50px;">Refresh</button>
     <div id="teamInfo">
-        <% teamInfo.forEach(competitor => { %>
-            <div style="<%= competitor.highlight ? 'color: red;' : '' %>">
-                <h2><%= competitor.name %></h2>
-                <p>Team: <%= competitor.team %></p>
-                <p>Mat: <%= competitor.mat %></p>
-                <p>Time: <%= competitor.time %></p>
-                <p>Date: <%= competitor.date %></p> <!-- Added date -->
-            </div>
-        <% }); %>
+        <% if (teamInfo && teamInfo.length > 0) { %>
+            <% teamInfo.forEach(competitor => { %>
+                <div style="<%= competitor.highlight ? 'color: red;' : '' %>">
+                    <h2><%= competitor.name %></h2>
+                    <p>Team: <%= competitor.team %></p>
+                    <p>Mat: <%= competitor.mat %></p>
+                    <p>Time: <%= competitor.time %></p>
+                    <p>Date: <%= competitor.date %></p>
+                </div>
+            <% }); %>
+        <% } else { %>
+            <p>No competitors found.</p>
+        <% } %>
     </div>
 </body>
 

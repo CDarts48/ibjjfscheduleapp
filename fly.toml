@@ -1,10 +1,10 @@
-# fly.toml app configuration file generated for masterapp-wild-wildflower-4750 on 2024-08-27T21:53:27-06:00
+# fly.toml app configuration file generated for masterapp-still-leaf-7107 on 2025-04-25T11:14:27-06:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'masterapp-wild-wildflower-4750'
-primary_region = 'ord'
+app = 'masterapp-still-leaf-7107'
+primary_region = 'den'
 
 [build]
 

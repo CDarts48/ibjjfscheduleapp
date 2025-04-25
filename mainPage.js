@@ -1,20 +1,22 @@
 const express = require('express');
-const { getAllEastonCompetitors } = require('./matches.js'); // replace with the path to your script
+const { getAllCompetitors } = require('./matches.js');
 
 const app = express();
 app.set('view engine', 'ejs');
 
 app.get('/', async (req, res) => {
     const urls = [];
-    const baseUrl = 'https://www.bjjcompsystem.com/tournaments/2360/tournament_days/3446?page=';
-
+    // This is the base URL it needs to be updated based on the tournament and tournament day
+    const baseUrl = 'https://www.bjjcompsystem.com/tournaments/2734/tournament_days/3934';
+    // if there are more than 8 pages, update the loop accordingly
     for (let i = 1; i <= 8; i++) {
-        urls.push(`${baseUrl}${i}`);
+        urls.push(`${baseUrl}?page=${i}`);
     }
 
     try {
-        const teamInfo = await getAllEastonCompetitors(urls);
-        res.render('index', { teamInfo }); // replace 'index' with the name of your EJS file
+        const teamInfo = await getAllCompetitors(urls, baseUrl);
+        console.log(teamInfo);
+        res.render('index', { teamInfo });
     } catch (error) {
         console.error(`Error in promise: ${error.message}`);
         res.status(500).send('An error occurred while fetching the team info.');

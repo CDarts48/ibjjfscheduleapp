@@ -1,99 +1,136 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 
-async function getAllEastonCompetitors(urls) {
+function log(message, data = null) {
+    console.log(message, data || '');
+}
+
+function convertTo24Hour(time) {
+    const [mainTime, period] = time.split(' ');
+    let [hours, minutes] = mainTime.split(':');
+
+    if (period === 'PM' && hours !== '12') {
+        hours = Number(hours) + 12;
+    } else if (period === 'AM' && hours === '12') {
+        hours = '00';
+    }
+
+    return `${hours}:${minutes}`;
+}
+
+function extractCompetitorDetails($, competitorDiv, matNumber, hardCodedDate) {
+    const competitorName = $(competitorDiv).find('.match-card__competitor-name').text().trim();
+    const teamName = $(competitorDiv).find('.match-card__club-name').text().trim();
+    const competitorId = $(competitorDiv).attr('id')?.replace('competitor-', '');
+    const matchTime = $(competitorDiv).closest('li').find('.match-header__when').text().trim();
+    const timeWithoutFightNumber = matchTime.split(': FIGHT')[0];
+
+    return {
+        id: competitorId,
+        name: competitorName,
+        team: teamName,
+        mat: matNumber,
+        time: timeWithoutFightNumber,
+        date: hardCodedDate
+    };
+}
+
+function sortCompetitorsByTime(competitors) {
+    return competitors.sort((a, b) => {
+        const timeA = convertTo24Hour(a.time);
+        const timeB = convertTo24Hour(b.time);
+
+        const dateA = new Date(`1970-01-01T${timeA}`);
+        const dateB = new Date(`1970-01-01T${timeB}`);
+
+        return dateA - dateB;
+    });
+}
+
+function highlightCompetitors(competitors) {
+    for (let i = 0; i < competitors.length - 1; i++) {
+        if (competitors[i].time === competitors[i + 1].time) {
+            competitors[i].highlight = true;
+            competitors[i + 1].highlight = true;
+        }
+    }
+}
+
+async function getAllCompetitors(urls, baseUrl) {
     try {
+        if (!baseUrl || typeof baseUrl !== 'string') {
+            throw new Error('Invalid or missing baseUrl');
+        }
+
+        log('Received Base URL:', baseUrl);
+
         const allCompetitors = [];
 
-        // Define the convertTo24Hour function
-        function convertTo24Hour(time) {
-            const [mainTime, period] = time.split(' ');
-            let [hours, minutes] = mainTime.split(':');
+        // Step 1: Fetch the base URL to extract the date
+        log('Fetching Base URL for Date:', baseUrl);
+        const baseResponse = await axios.get(baseUrl);
 
-            if (period === 'PM' && hours !== '12') {
-                hours = Number(hours) + 12;
-            } else if (period === 'AM' && hours === '12') {
-                hours = '00';
-            }
+        const $base = cheerio.load(baseResponse.data);
 
-            return `${hours}:${minutes}`;
+        // Extract the date from the span with class "sidebar__date"
+        const sidebarDateText = $base('.sidebar__date').text().trim();
+        log('Extracted Sidebar Date Text:', sidebarDateText);
+
+        // Parse the date (e.g., "Saturday, 04/26 (10 Mats)" -> "Sat, 04/26")
+        const dateMatch = sidebarDateText.match(/(\w+), (\d{2}\/\d{2})/);
+        const extractedDate = dateMatch ? dateMatch[0] : 'Unknown Date';
+        log('Parsed Date:', extractedDate);
+
+        if (extractedDate === 'Unknown Date') {
+            throw new Error('Failed to extract date from base URL');
         }
 
+        // Step 2: Process competitors for each URL
         await Promise.all(urls.map(async (url) => {
-            const response = await axios.get(url);
-            const $ = cheerio.load(response.data);
-            const matElements = $('.categories-grid__column.sticky-panel');
+            try {
+                log('Fetching URL:', url);
+                const response = await axios.get(url);
+                log('HTML Response Length:', response.data.length);
 
-            matElements.each((i, matElement) => {
-                const matNumber = $(matElement).find('.grid-column__header').text().trim();
-                const competitors = $(matElement).next().find('.match-card__competitor');
+                const $ = cheerio.load(response.data);
+                const matElements = $('.categories-grid__column.sticky-panel');
+                log('Mat Elements Found:', matElements.length);
 
-                competitors.each((j, competitorDiv) => {
-                    const competitorLink = $(competitorDiv).find('a');
-                    const competitorName = $(competitorDiv).find('.match-card__competitor-name').text().trim();
-                    const teamName = $(competitorDiv).find('.match-card__club-name').text().trim();
-                    const competitorId = $(competitorDiv).attr('id').replace('competitor-', '');
-                    const matchTime = $(competitorDiv).closest('li').find('.match-header__when').text().trim();
-                    const timeWithoutFightNumber = matchTime.split(': FIGHT')[0];
-                    const hardCodedDate = 'Thu 08/29';
+                matElements.each((i, matElement) => {
+                    const matNumber = $(matElement).find('.grid-column__header').text().trim();
+                    log('Mat Number:', matNumber);
 
-                    if (teamName === 'Easton BJJ' && competitorId && !allCompetitors.some(c => c.id === competitorId)) {
-                        allCompetitors.push({
-                            id: competitorId,
-                            name: competitorName,
-                            team: teamName,
-                            mat: matNumber,
-                            time: timeWithoutFightNumber,
-                            date: hardCodedDate
-                        });
-                    }
+                    const competitors = $(matElement).next().find('.match-card__competitor');
+                    log('Competitors Found:', competitors.length);
+
+                    competitors.each((j, competitorDiv) => {
+                        const competitorDetails = extractCompetitorDetails($, competitorDiv, matNumber, extractedDate);
+
+                        // Here is where you update the team name. What ever is entered here will the team that is rendered.
+                        if (competitorDetails.team === 'Nova União' && competitorDetails.id && !allCompetitors.some(c => c.id === competitorDetails.id)) {
+                            log('Competitor Details:', competitorDetails);
+                            allCompetitors.push(competitorDetails);
+                        }
+                    });
                 });
-            });
+            } catch (error) {
+                console.error(`Error fetching data from ${url}: ${error.message}`);
+            }
         }));
 
-        // Sort the competitors by time
-        allCompetitors.sort((a, b) => {
-            // Extract the time part from the string
-            const timeA = convertTo24Hour(a.time.split(': FIGHT')[0]);
-            const timeB = convertTo24Hour(b.time.split(': FIGHT')[0]);
+        log('All Competitors Before Sorting:', allCompetitors);
+        sortCompetitorsByTime(allCompetitors);
+        log('All Competitors After Sorting:', allCompetitors);
 
-            // Convert the time to a Date object
-            const dateA = new Date(`1970-01-01T${timeA}`);
-            const dateB = new Date(`1970-01-01T${timeB}`);
-
-            // Compare the dates
-            return dateA - dateB;
-        });
-
-        // Highlight competitors with the same match time
-        for (let i = 0; i < allCompetitors.length - 1; i++) {
-            if (allCompetitors[i].time === allCompetitors[i + 1].time) {
-                allCompetitors[i].highlight = true;
-                allCompetitors[i + 1].highlight = true;
-            }
-        }
+        highlightCompetitors(allCompetitors);
+        log('Final Competitors with Highlights:', allCompetitors);
 
         return allCompetitors;
 
     } catch (error) {
-        console.error(`Error in getAllEastonCompetitors: ${error.message}`);
+        console.error(`Error in getAllCompetitors: ${error.message}`);
+        return [];
     }
 }
 
-// Dynamically generate URLs for pages 1 through 8
-const urls = [];
-const baseUrl = 'https://www.bjjcompsystem.com/tournaments/2360/tournament_days/3446?page=';
-
-for (let i = 1; i <= 8; i++) {
-    urls.push(`${baseUrl}${i}`);
-}
-
-getAllEastonCompetitors(urls)
-    .then(competitors => {
-        competitors.forEach(competitor => {
-            console.log(`ID: ${competitor.id}, Name: ${competitor.name}, Team: ${competitor.team}, Mat: ${competitor.mat}, Time: ${competitor.time}, Date: ${competitor.date}`);
-        });
-    })
-    .catch(error => console.error(`Error in promise: ${error.message}`));
-
-module.exports = { getAllEastonCompetitors };
+module.exports = { getAllCompetitors };
