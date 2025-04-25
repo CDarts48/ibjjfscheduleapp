@@ -1,9 +1,9 @@
-# fly.toml app configuration file generated for masterapp-still-leaf-7107 on 2025-04-25T11:14:27-06:00
+# fly.toml app configuration file generated for ibjjfscheduleapp on 2025-04-25T18:44:03Z
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'masterapp-still-leaf-7107'
+app = 'ibjjfscheduleapp'
 primary_region = 'den'
 
 [build]
@@ -20,3 +20,4 @@ primary_region = 'den'
   memory = '1gb'
   cpu_kind = 'shared'
   cpus = 1
+  memory_mb = 1024
