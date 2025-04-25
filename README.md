@@ -13,9 +13,8 @@ This application fetches and displays competitor schedules for IBJJF tournaments
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/ibjjfscheduleapp.git
+   git clone https://github.com/cedarts48/ibjjfscheduleapp.git
    cd ibjjfscheduleapp
-   ```markdown
 # IBJJF Schedule App
 
 This application fetches and displays competitor schedules for IBJJF tournaments. It highlights conflicts where competitors are scheduled to compete at the same time.
