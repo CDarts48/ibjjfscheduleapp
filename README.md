@@ -1,6 +1,6 @@
 # IBJJF Schedule App
 
-This application fetches and displays competitor schedules for IBJJF tournaments. It highlights conflicts where competitors are scheduled to compete at the same time.
+This application fetches and displays competitor schedules for IBJJF tournaments. More comps to ba added soon. It highlights conflicts where competitors are scheduled to compete at the same time.
 
 ## Features
 
